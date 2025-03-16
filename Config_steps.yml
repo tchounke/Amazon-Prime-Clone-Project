@@ -11,7 +11,7 @@ create user token:
       user: create user token
       tokens: click on Tokens (3 bars)
         - name: sonar-token
-        - token: squ_32cfa6fc672b65e5be394ec191f80b9af10efa01
+        - token: squ_32cfa6fc672b65e5be394f10efa01
 
 storing secrets in jenkins:
   manage jenkins:
