@@ -1,0 +1,115 @@
+webhook for sonarqube:
+  - Administration:
+      Configuration: create webhook
+      Webhook:
+        - name: sonarqube-webhook
+        - url: http://'$ip':8080/sonarqube-webhook
+        - secret:
+
+create user token:
+  - Security:
+      user: create user token
+      tokens: click on Tokens (3 bars)
+        - name: sonar-token
+        - token: squ_32cfa6fc672b65e5be394ec191f80b9af10efa01
+
+storing secrets in jenkins:
+  manage jenkins:
+    - Credentials:
+        - System:
+            - Global credentials:
+                - secret text: sonar-token
+                - secret text: <YOUR_GithubPersonalAccessToken_HERE>
+                - description: sonar-token
+
+## storing AWS Access and secret keys to be able to EKS & ecr Commands from Jenkins
+storing AWS Access and secret keys to be able to EKS & ecr Commands from Jenkins:
+  manage jenkins:
+    - Credentials:
+        - System:
+            - Global credentials:
+                - secret text: XXXXXXXXXXXXXXXXXXXXX
+                - secret text: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                - description: AWS Keys
+
+##Configure Jenkins
+install Jenkins Plugins:
+  manage jenkins:
+    - Plugins:
+        - install plugins:
+            - sonarqube scanner
+            - nodejs
+            - Pipeline: Stage View
+            - Eclipse Temurin installer ## require for jdk tools
+            - Docker,Docker Commons,Docker Pipeline,Docker API,docker-build-step
+            - Prometheus metrics,
+            - install with restart ## or you can do without restart
+
+## Integrate sonarqube server with jenkins
+setup sonarqube server:
+  manage jenkins:
+    - system: scroll down
+      SonarQube servers:
+        - SonarQube installations:
+              add sonarqube server:
+                - name: sonar-server
+                - server url: http://'$ip':9000  ##this is sonarqube URL
+                - token: sonar-token
+                - click on save
+
+integrate jdk  with jenkins:
+  manage jenkins:
+    - system: scroll down
+      tools:
+        - JDK:
+            - JDK installations:
+                - add JDK installation:
+                    - name: jdk
+                    - install automatically: check
+                        - version: jdk-17.0.8
+        - nodejs:
+            - nodejs installations:
+                - add nodejs installation:
+                    - name: NodeJS
+                          - version: 16.20.0
+        - sonar-scanner:
+            - sonar-scanner installations:
+                - add sonar-scanner installation:
+                    - name: SonarQube Scanner
+                        - version: 4.6.0.2311  ### whatever version is shwoing 
+        - docker:
+            - docker installations:
+                - add docker installation:
+                    - name: Docker
+                    - install automatically: check
+                        - add installer: Download from docker.com
+                        - version: latest
+                        - click save 
+
+
+create a new pipeline job:
+  - new item:
+      - pipeline:
+          - pipeline name: build-pipeline
+          - script:
+
+create a pipeline syntax for git:
+  - Sample Step: git:Git
+  
+
+
+
+
+
+
+pipeline {
+    agent any
+
+    stages {
+        stage('1. git checkout') {
+            steps {
+                echo 'Hello World'
+            }
+        }
+    }
+}
